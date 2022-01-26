@@ -5,8 +5,7 @@ data = open('input.txt', 'r').read().strip('\n').split('\n')
 data_parser_regex = re.compile('^(\d+),(\d+)\s->\s(\d+),(\d+)$')
 
 def line_to_list(line):
-    l = [int(x) for x in data_parser_regex.match(line).groups()]
-    return [l[0], l[1], l[2], l[3]]
+    return [int(x) for x in data_parser_regex.match(line).groups()]
 
 data = [line_to_list(x) for x in data]
 
