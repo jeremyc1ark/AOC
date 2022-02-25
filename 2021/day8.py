@@ -134,7 +134,6 @@ def solve_segments(patterns):
     return remove_set_wrappers(ntl)            
     
 
-
 def decipher_digit(key, digit_string):
     lighting = {key[char] for char in digit_string}
     for i, l in enumerate(lighting_ref):
@@ -151,6 +150,7 @@ def part_2():
     return sum([decipher_line(line) for line in data])
 
 if __name__ == '__main__':
+    print(part_1())
     print(part_2())
     
     
