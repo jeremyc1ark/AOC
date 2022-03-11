@@ -2,14 +2,10 @@ import collections
 
 data = open('input.txt', 'r').read().strip('\n').split('\n')
 
-correspondence_dict = {
-    '(': ')',
-    '[': ']',
-    '{': '}',
-    '<': '>'
-}
+open_chars = set("([{<")
+close_chars = set(")]}>")
 
-closing_chars = set(")]}>")
+open_to_close = dict(zip(tuple("([{<"), tuple(")]}>")))
 
 penalty_dict = {
     ')': 3,
@@ -18,36 +14,24 @@ penalty_dict = {
     '>': 25137
 }
 
-# <{([([[(<>()){}]>(<<{{ - Expected ], but found > instead.
 
-char_status = collections.namedtuple('char_status', ['i', 'char', 'status'])
-
-def find_chunk_end(line, i=0):
-    open_char = line[i]
-    if open_char in closing_chars:
-        return char_status(i, line[i], False)
-    valid_closer = correspondence_dict[open_char]
-    line_range = range(len(line))
-    if i + 1 not in line_range:
-        return char_status(i, None, False)
-    if line[i+1] == valid_closer:
-        return char_status(i+1, line[i+1], True)
-    
-    def get_to_end(i):
-        end_of_internal_chunk = find_chunk_end(line, i+1)
-        if end_of_internal_chunk.status:
-            if end_of_internal_chunk.i + 2 in range(len(line)):
-                if line[end_of_internal_chunk.i + 1] == valid_closer:
-                    new_i = end_of_internal_chunk.i + 1
-                    return char_status(new_i, line[new_i], True)
-                else:
-                    return get_to_end(end_of_internal_chunk + 1)
+def test_line(l):
+    i = 0
+    stack = collections.deque()
+    while i < len(l):
+        char = l[i]
+        if char in open_chars:
+            stack.append(open_to_close[char])
         else:
-            return end_of_internal_chunk
-    
-    return get_to_end(i)
+            if stack:
+                expected_close = stack.pop()
+                if char != expected_close:
+                    return penalty_dict[char]
+            else:
+                return penalty_dict[char]
+        i += 1
+    return 0
 
-
+        
 if __name__ == '__main__':
-    line = "(((())"
-    print(find_chunk_end(line))
+    print(sum(map(test_line, data)))
